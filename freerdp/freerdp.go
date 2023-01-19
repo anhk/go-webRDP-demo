@@ -2,9 +2,9 @@ package freerdp
 
 /*
 #cgo darwin CFLAGS: -I /opt/homebrew/Cellar/freerdp/2.9.0/include/freerdp2 -I /opt/homebrew/Cellar/freerdp/2.9.0/include/winpr2/
-#cgo darwin LDFLAGS: -L /opt/homebrew/Cellar/freerdp/2.9.0/lib  -lfreerdp2 -lfreerdp-client2 -lwinpr2
+#cgo darwin LDFLAGS: -L /opt/homebrew/Cellar/freerdp/2.9.0/lib -lfreerdp2 -lfreerdp-client2 -lwinpr2
 #cgo linux CFLAGS: -I /usr/include/winpr2/ -I /usr/include/freerdp2/
-#cgo linux LDFLAGS:
+#cgo linux LDFLAGS: -lfreerdp2 -lfreerdp-client2 -lwinpr2
 
 #if __APPLE__
 #include <TargetConditionals.h>
