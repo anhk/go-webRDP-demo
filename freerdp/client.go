@@ -50,6 +50,7 @@ func webRdpClientPreConnect(instance *C.freerdp) C.BOOL {
 	settings.BitmapCachePersistEnabled = 0
 	settings.GlyphSupportLevel = C.GLYPH_SUPPORT_NONE
 
+	//seelog.Debugf("width: %v, height: %v", settings.DesktopWidth, settings.DesktopHeight)
 	if instance.context.cache == nil {
 		instance.context.cache = C.cache_new(instance.settings)
 	}

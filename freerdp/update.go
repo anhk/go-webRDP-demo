@@ -29,19 +29,16 @@ static void init_update_callbacks(rdpUpdate *update)
 import "C"
 
 func registerUpdateCallbacks(update *C.rdpUpdate) {
-
 	C.init_update_callbacks(update)
 }
 
 //export webRdpUpdateBeginPaint
 func webRdpUpdateBeginPaint(context *C.rdpContext) C.BOOL {
-
 	return C.TRUE
 }
 
 //export webRdpUpdateEndPaint
 func webRdpUpdateEndPaint(context *C.rdpContext) C.BOOL {
-
 	return C.TRUE
 }
 
@@ -52,18 +49,15 @@ func webRdpUpdatePlaySound(context *C.rdpContext, playSound *C.cPsu) C.BOOL {
 
 //export webRdpUpdateDesktopResize
 func webRdpUpdateDesktopResize(context *C.rdpContext) C.BOOL {
-
 	return C.TRUE
 }
 
 //export webRdpUpdateSetKeyboardIndicators
 func webRdpUpdateSetKeyboardIndicators(context *C.rdpContext, ledFlags C.UINT16) C.BOOL {
-
 	return C.TRUE
 }
 
 //export  webRdpUpdateSetKeyboardImeStatus
 func webRdpUpdateSetKeyboardImeStatus(context *C.rdpContext, imeId C.UINT16, imeState C.UINT32, imeConvMode C.UINT32) C.BOOL {
-
 	return C.TRUE
 }
