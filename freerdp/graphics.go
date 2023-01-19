@@ -51,17 +51,25 @@ func webRdpBitmapPaint(context *C.rdpContext, bitmap *C.rdpBitmap) C.BOOL {
 		return C.TRUE
 	}
 
+	////fmt.Printf("left: %v, top: %v, right: %v, bottom: %v, width: %v, height: %v, format: %v, flags: %v, length: %v, comparessed: %v, ep")
+	//fmt.Printf("%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v\n",
+	//	bitmap.left, bitmap.top, bitmap.right, bitmap.bottom, bitmap.width, bitmap.height,
+	//	bitmap.format, bitmap.flags, bitmap.length, bitmap.compressed, bitmap.ephemeral)
+
+	//bitmap.format = 0x20010888
+	//bitmap.flags = 0
+
 	w := int(bitmap.width)
 	h := int(bitmap.height)
 	data := C.GoBytes(unsafe.Pointer(bitmap.data), C.int(bitmap.length))
 
 	img := image.NewRGBA(image.Rect(0, 0, w, h))
-	i := 0
-	for y := 0; y < h; y++ {
+
+	for y, i := 0, 0; y < h; y++ {
 		for x := 0; x < w; x++ {
-			img.Set(x, y, color.RGBA{R: data[i+2], G: data[i+1], B: data[i], A: 255})
+			img.Set(x, y, color.RGBA{R: data[i+1], G: data[i+2], B: data[i+3], A: 255})
+			i += 4
 		}
-		i += 4
 	}
 
 	buf := new(bytes.Buffer)
