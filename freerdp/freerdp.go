@@ -63,8 +63,6 @@ import "C"
 import (
 	"fmt"
 	"unsafe"
-
-	"github.com/cihub/seelog"
 )
 
 type Client struct {
@@ -119,17 +117,14 @@ func (c *Client) Start() error {
 	for C.freerdp_shall_disconnect(context.instance) != C.TRUE {
 		r := C.freerdp_get_event_handles(context, &handlers[0], 64)
 		if r == 0 {
-			seelog.Info("freerdp_get_event_handles failed")
 			break
 		}
 		if w := C.WaitForMultipleObjects(r, &handlers[0], C.FALSE, 250); w == C.WAIT_FAILED {
-			seelog.Info("WaitForMultipleObjects failed: %v", w)
 			break
 		} else if w == C.WAIT_TIMEOUT {
 			continue
 		}
 		if C.freerdp_check_event_handles(context) == C.FALSE {
-			seelog.Info("freerdp_check_event_handles failed")
 			break
 		}
 	}

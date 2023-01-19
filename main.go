@@ -8,12 +8,9 @@ import (
 	"image/draw"
 	"image/png"
 	"os"
-
-	"github.com/cihub/seelog"
 )
 
 func main() {
-	defer seelog.Flush()
 
 	client := freerdp.NewClient("10.226.239.200",
 		"administrator", "xThXxsP7mQ0Xufjux")
