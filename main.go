@@ -8,12 +8,15 @@ import (
 	"image/draw"
 	"image/png"
 	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
-func main() {
-
+func rdpC() {
+	//
 	client := freerdp.NewClient("10.226.239.200",
 		"administrator", "xThXxsP7mQ0Xufjux")
+
 	if err := client.Connect(); err != nil {
 		panic(err)
 	}
@@ -37,19 +40,22 @@ func main() {
 					img,
 					image.Point{},
 					draw.Over)
-				//draw.Draw(des, des.Bounds(), img, img.Bounds().Min, draw)
-				//fmt.Println("###", msg.Bitmap.X, msg.Bitmap.Y, msg.Bitmap.W, msg.Bitmap.H, len(msg.Bitmap.Data))
 				if num++; num%100 == 0 {
 					buf := new(bytes.Buffer)
 					_ = png.Encode(buf, des)
 					_ = os.WriteFile(fmt.Sprintf("./tmp/img-%v.png", num), buf.Bytes(), 0644)
 				}
-				//_ = os.WriteFile(fmt.Sprintf("./tmp/%v.png", num), data, 0644)
-				//fmt.Printf("### %v\n", len(data))
 			}
 		}
 	}()
 	if err := client.Start(); err != nil {
 		panic(err)
 	}
+}
+
+func main() {
+	r := gin.Default()
+	r.GET("/api/rdp", rdpProxy)
+	r.Use(feMw("/"))
+	_ = r.Run(":8081")
 }
