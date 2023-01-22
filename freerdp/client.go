@@ -10,6 +10,7 @@ package freerdp
 #include "freerdp/gdi/gdi.h"
 */
 import "C"
+import "fmt"
 
 //export webRdpClientGlobalInit
 func webRdpClientGlobalInit() C.BOOL {
@@ -27,6 +28,7 @@ func webRdpClientNew(instance *C.freerdp, context *C.rdpContext) C.BOOL {
 
 //export webRdpClientFree
 func webRdpClientFree(instance *C.freerdp, context *C.rdpContext) {
+	fmt.Println("webRdpClientStop")
 }
 
 //export webRdpClientStart
@@ -36,6 +38,7 @@ func webRdpClientStart(context *C.rdpContext) C.int {
 
 //export webRdpClientStop
 func webRdpClientStop(context *C.rdpContext) C.int {
+	fmt.Println("webRdpClientStop")
 	return 0
 }
 

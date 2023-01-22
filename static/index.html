@@ -39,7 +39,11 @@
             console.log('close:', e)
         }
         ws.onmessage = function (msg) {
-            console.log('message:', msg.data)
+            let {bitmap} = JSON.parse(msg.data)
+            let img = new Image(bitmap.w, bitmap.h)
+            img.src = 'data:image/png;base64,' + bitmap.data
+            let ctx = $('#canvas')[0].getContext('2d')
+            ctx.drawImage(img, bitmap.x, bitmap.y)
         }
 
     })

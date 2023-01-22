@@ -48,7 +48,7 @@ func feMw(urlPrefix string) gin.HandlerFunc {
 				return
 			}
 			c.Status(200)
-			c.Writer.Write(bs)
+			_, _ = c.Writer.Write(bs)
 			c.Abort()
 		}
 	}

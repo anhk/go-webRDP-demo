@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"go-webRDP-demo/freerdp"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -21,9 +21,35 @@ func rdpProxy(ctx *gin.Context) {
 		panic(err)
 	}
 
+	client := freerdp.NewClient("192.168.1.129",
+		"anhk", "my-password")
+
+	if err := client.Connect(); err != nil {
+		panic(err)
+	}
+	defer client.DisConnect()
+
+	go func() {
+		if err := client.Start(); err != nil {
+			panic(err)
+		}
+	}()
+
+	go func() {
+		var msg freerdp.Message
+		if err := ws.ReadJSON(&msg); err != nil {
+			fmt.Println("read from websocket fail:", err)
+			client.DisConnect()
+		}
+	}()
+
 	for {
-		msg := freerdp.Message{}
-		_ = ws.WriteJSON(&msg)
-		time.Sleep(time.Second)
+		if msg, ok := client.Data(); !ok {
+			fmt.Println(" !ok ")
+			break
+		} else if err := ws.WriteJSON(&msg); err != nil {
+			fmt.Println(" err: ", err)
+			break
+		}
 	}
 }

@@ -70,6 +70,7 @@ import (
 type Client struct {
 	context  *C.rdpContext
 	dataChan chan *Message
+	isClosed bool
 }
 
 func NewClient(addr, username, password string) *Client {
@@ -134,8 +135,18 @@ func (c *Client) Start() error {
 }
 
 func (c *Client) DisConnect() {
+	fmt.Println("---- ")
+
+	if c.isClosed {
+		return
+	}
+
+	c.isClosed = true
+	close(c.dataChan)
+
 	context := c.context
 	C.freerdp_disconnect(context.instance)
+
 }
 
 func (c *Client) Data() (*Message, bool) {
