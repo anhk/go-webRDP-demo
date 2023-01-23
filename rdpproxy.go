@@ -36,12 +36,24 @@ func rdpProxy(ctx *gin.Context) {
 	}()
 
 	go func() {
-		var msg freerdp.Message
-		if err := ws.ReadJSON(&msg); err != nil {
-			fmt.Println("read from websocket fail:", err)
-			client.DisConnect()
+		for {
+			var msg freerdp.Message
+			if err := ws.ReadJSON(&msg); err != nil {
+				fmt.Println("read from websocket fail:", err)
+				client.DisConnect()
+				break
+			} else {
+				//fmt.Println(msg.Mouse)
+				if msg.Mouse != nil {
+					client.ProcessMouseEvent(msg.Mouse)
+				}
+			}
 		}
 	}()
+
+	//cnt := 0
+	//dest := image.NewRGBA(image.Rect(0, 0, 1024, 768))
+	//_ = os.Mkdir("./tmp/", 0755)
 
 	for {
 		if msg, ok := client.Data(); !ok {
@@ -50,6 +62,24 @@ func rdpProxy(ctx *gin.Context) {
 		} else if err := ws.WriteJSON(&msg); err != nil {
 			fmt.Println(" err: ", err)
 			break
+		} else {
+			// 打印图片
+			//img, _ := png.Decode(bytes.NewReader(msg.Bitmap.Data))
+			//draw.Draw(dest,
+			//	image.Rect(msg.Bitmap.X, msg.Bitmap.Y, msg.Bitmap.X+msg.Bitmap.W, msg.Bitmap.Y+msg.Bitmap.H),
+			//	img, image.Point{}, draw.Over)
+			//if cnt++; cnt%100 == 0 {
+			//	buf := new(bytes.Buffer)
+			//	_ = png.Encode(buf, dest)
+			//	_ = os.WriteFile(fmt.Sprintf("./tmp/img-%v.png", cnt), buf.Bytes(), 0644)
+			//}
+
+			// 打印信息
+			//b64 := base64.StdEncoding.EncodeToString(msg.Bitmap.Data)
+			//m := md5.Sum([]byte(b64))
+
+			//fmt.Printf("send msg #%v, x:%v, y:%v, w:%v, h:%v, len:%v, md5:%x\n", cnt,
+			//	msg.Bitmap.X, msg.Bitmap.Y, msg.Bitmap.W, msg.Bitmap.H, len(b64), m)
 		}
 	}
 }

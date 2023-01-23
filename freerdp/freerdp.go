@@ -60,6 +60,12 @@ static void init_instance(freerdp *instance)
 	instance->PostConnect = webRdpClientPostConnect;
 	instance->Authenticate = webRdpClientAuthenticate;
 }
+
+static void send_mouse_event(freerdp *instance, UINT16 flags, int x, int y)
+{
+	rdpInput *input = instance->input;
+	input->MouseEvent(input, flags, x, y);
+}
 */
 import "C"
 import (
@@ -152,4 +158,30 @@ func (c *Client) DisConnect() {
 func (c *Client) Data() (*Message, bool) {
 	data, ok := <-c.dataChan
 	return data, ok
+}
+
+// 鼠标事件
+func (c *Client) ProcessMouseEvent(mouse *Mouse) {
+	switch mouse.Type {
+	case "mousemove":
+		C.send_mouse_event(c.context.instance, C.PTR_FLAGS_MOVE, C.int(mouse.X), C.int(mouse.Y))
+	case "mosedown":
+		switch mouse.Btn {
+		case 0: // 左
+			C.send_mouse_event(c.context.instance, C.PTR_FLAGS_DOWN|C.PTR_FLAGS_BUTTON1, C.int(mouse.X), C.int(mouse.Y))
+		case 1: // 中
+			C.send_mouse_event(c.context.instance, C.PTR_FLAGS_DOWN|C.PTR_FLAGS_BUTTON3, C.int(mouse.X), C.int(mouse.Y))
+		case 2: // 右
+			C.send_mouse_event(c.context.instance, C.PTR_FLAGS_DOWN|C.PTR_FLAGS_BUTTON2, C.int(mouse.X), C.int(mouse.Y))
+		}
+	case "mouseup":
+		switch mouse.Btn {
+		case 0: // 左
+			C.send_mouse_event(c.context.instance, C.PTR_FLAGS_BUTTON1, C.int(mouse.X), C.int(mouse.Y))
+		case 1: // 中
+			C.send_mouse_event(c.context.instance, C.PTR_FLAGS_BUTTON3, C.int(mouse.X), C.int(mouse.Y))
+		case 2: // 右
+			C.send_mouse_event(c.context.instance, C.PTR_FLAGS_BUTTON2, C.int(mouse.X), C.int(mouse.Y))
+		}
+	}
 }
