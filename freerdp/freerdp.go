@@ -66,6 +66,12 @@ static void send_mouse_event(freerdp *instance, UINT16 flags, int x, int y)
 	rdpInput *input = instance->input;
 	input->MouseEvent(input, flags, x, y);
 }
+
+static void send_keyboard_event(freerdp *instance, UINT16 flags, int k)
+{
+	rdpInput *input = instance->input;
+	input->KeyboardEvent(input, flags, k);
+}
 */
 import "C"
 import (
@@ -165,7 +171,7 @@ func (c *Client) ProcessMouseEvent(mouse *Mouse) {
 	switch mouse.Type {
 	case "mousemove":
 		C.send_mouse_event(c.context.instance, C.PTR_FLAGS_MOVE, C.int(mouse.X), C.int(mouse.Y))
-	case "mosedown":
+	case "mousedown":
 		switch mouse.Btn {
 		case 0: // 左
 			C.send_mouse_event(c.context.instance, C.PTR_FLAGS_DOWN|C.PTR_FLAGS_BUTTON1, C.int(mouse.X), C.int(mouse.Y))
@@ -183,5 +189,107 @@ func (c *Client) ProcessMouseEvent(mouse *Mouse) {
 		case 2: // 右
 			C.send_mouse_event(c.context.instance, C.PTR_FLAGS_BUTTON2, C.int(mouse.X), C.int(mouse.Y))
 		}
+	}
+}
+
+var keyMap = map[int]int{
+	8:   0xE,    // Backspace
+	9:   0xF,    // Tab
+	13:  0x1C,   // Enter
+	16:  0x2A,   // ShiftLeft
+	17:  0x1D,   // ControlLeft
+	18:  0x38,   // AltLeft
+	20:  0x3A,   // CapsLock
+	27:  0x1,    // Escape
+	32:  0x39,   // Space
+	37:  0xE04B, // ArrowLeft
+	38:  0xE048, // ArrowUp
+	39:  0xE04D, // ArrowRight
+	40:  0xE050, // ArrowDown
+	48:  0xB,    // Digit0
+	49:  0x2,    // Digit1
+	50:  0x3,    // Digit2
+	51:  0x4,    // Digit3
+	52:  0x5,    // Digit4
+	53:  0x6,    // Digit5
+	54:  0x7,    // Digit6
+	55:  0x8,    // Digit7
+	56:  0x9,    // Digit8
+	57:  0xA,    // Digit9
+	59:  0x27,   // Semicolon
+	61:  0xD,    // Equal
+	65:  0x1E,   // KeyA
+	66:  0x30,   // KeyB
+	67:  0x2E,   // KeyC
+	68:  0x20,   // KeyD
+	69:  0x12,   // KeyE
+	70:  0x21,   // KeyF
+	71:  0x22,   // KeyG
+	72:  0x23,   // KeyH
+	73:  0x17,   // KeyI
+	74:  0x24,   // KeyJ
+	75:  0x25,   // KeyK
+	76:  0x26,   // KeyL
+	77:  0x32,   // KeyM
+	78:  0x31,   // KeyN
+	79:  0x18,   // KeyO
+	80:  0x19,   // KeyP
+	81:  0x10,   // KeyQ
+	82:  0x13,   // KeyR
+	83:  0x1F,   // KeyS
+	84:  0x14,   // KeyT
+	85:  0x16,   // KeyU
+	86:  0x2F,   // KeyV
+	87:  0x11,   // KeyW
+	88:  0x2D,   // KeyX
+	89:  0x15,   // KeyY
+	90:  0x2C,   // KeyZ
+	91:  0xE05B, // OSLeft
+	93:  0xE05D, // ContextMenu
+	96:  0x52,   // Numpad0
+	97:  0x4F,   // Numpad1
+	98:  0x50,   // Numpad2
+	99:  0x51,   // Numpad3
+	100: 0x4B,   // Numpad4
+	101: 0x4C,   // Numpad5
+	102: 0x4D,   // Numpad6
+	103: 0x47,   // Numpad7
+	104: 0x48,   // Numpad8
+	105: 0x49,   // Numpad9
+	106: 0x37,   // NumpadMultiply
+	107: 0x4E,   // NumpadAdd
+	109: 0x4A,   // NumpadSubtract
+	110: 0x53,   // NumpadDecimal
+	111: 0xE035, // NumpadDivide
+	112: 0x3B,   // F1
+	113: 0x3C,   // F2
+	114: 0x3D,   // F3
+	115: 0x3E,   // F4
+	116: 0x3F,   // F5
+	117: 0x40,   // F6
+	118: 0x41,   // F7
+	119: 0x42,   // F8
+	120: 0x43,   // F9
+	121: 0x44,   // F10
+	122: 0x57,   // F11
+	123: 0x58,   // F12
+	144: 0xE045, // NumLock
+	173: 0xC,    // Minus
+	188: 0x33,   // Comma
+	190: 0x34,   // Period
+	191: 0x35,   // Slash
+	192: 0x29,   // Backquote
+	219: 0x1A,   // BracketLeft
+	220: 0x2B,   // Backslash
+	221: 0x1B,   // BracketRight
+	222: 0x28,   // Quote
+}
+
+func (c *Client) ProcessKeyboardEvent(keyboard *Keyboard) {
+	switch keyboard.Type {
+	case "keydown":
+		C.send_keyboard_event(c.context.instance, C.KBD_FLAGS_DOWN, C.int(keyMap[keyboard.K]))
+	case "keyup":
+		C.send_keyboard_event(c.context.instance, C.KBD_FLAGS_RELEASE, C.int(keyMap[keyboard.K]))
 	}
 }

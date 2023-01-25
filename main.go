@@ -5,6 +5,8 @@ import (
 )
 
 func WebServer() {
+	gin.SetMode(gin.ReleaseMode)
+
 	r := gin.Default()
 	r.GET("/api/rdp", rdpProxy)
 	r.Use(feMw("/"))

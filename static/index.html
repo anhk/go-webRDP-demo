@@ -9,7 +9,7 @@
     <script src="js/jquery.md5.min.js"></script>
 </head>
 <body>
-<canvas id="canvas"></canvas>
+<canvas id="canvas" tabindex="0"></canvas>
 
 <script>
     var w = window.innerWidth
@@ -36,13 +36,13 @@
             console.log('close:', e)
         }
         ws.onmessage = function (msg) {
-            const  {bitmap} = JSON.parse(msg.data)
+            let {bitmap} = JSON.parse(msg.data)
             let img = new Image(bitmap.w, bitmap.h)
             img.src = 'data:image/png;base64,' + bitmap.data
-            let ctx = $('#canvas')[0].getContext('2d')
-            ctx.drawImage(img, bitmap.x, bitmap.y, bitmap.w, bitmap.h)
-            console.log('cnt=', ++cnt, bitmap.x, bitmap.y, bitmap.w, bitmap.h,
-                'length:', bitmap.data.length)
+            img.onload = () => {
+                let ctx = $('#canvas')[0].getContext('2d')
+                ctx.drawImage(img, bitmap.x, bitmap.y)
+            }
         }
 
         return ws
@@ -59,32 +59,13 @@
 
     $(function () {
         resizeCanvas()
-        // let ws = createWebsocket()
-
-        var ws = new WebSocket('ws://' + window.location.host + '/api/rdp')
-        ws.onopen = function () {
-        }
-
-        ws.onerror = function (e) {
-            console.log('error:', e)
-        }
-        ws.onclose = function (e) {
-            console.log('close:', e)
-        }
-        ws.onmessage = function (msg) {
-            let {bitmap} = JSON.parse(msg.data)
-            let img = new Image(bitmap.w, bitmap.h)
-            img.src = 'data:image/png;base64,' + bitmap.data
-            img.onload=()=>{
-                let ctx = $('#canvas')[0].getContext('2d')
-                ctx.drawImage(img, bitmap.x, bitmap.y)
-            }
-        }
-
+        let ws = createWebsocket()
 
         $(window).resize(function () {
             resizeCanvas()
         })
+
+        $('#canvas').focus()
 
         // console.log($('#canvas'))
         $("#canvas").mousedown(function (e) {
@@ -106,10 +87,10 @@
             ws.send(JSON.stringify({"mouse": {"type": "mouseright", "x": x, "y": y, "btn": btn}}))
         })
         $("#canvas").keydown(function (e) {
-            // console.log('key down')
+            ws.send(JSON.stringify({"keyboard": {"type": "keydown", "k": e.keyCode }}))
         })
         $("#canvas").keyup(function (e) {
-            // console.log('key up')
+            ws.send(JSON.stringify({"keyboard": {"type": "keyup", "k": e.keyCode }}))
         })
     })
 </script>

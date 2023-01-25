@@ -15,7 +15,13 @@ type Mouse struct {
 	Btn  int    `json:"btn"`
 }
 
+type Keyboard struct {
+	Type string `json:"type"`
+	K    int    `json:"k"`
+}
+
 type Message struct {
-	Bitmap *Bitmap `json:"bitmap,omitempty"`
-	Mouse  *Mouse  `json:"mouse"`
+	Bitmap   *Bitmap   `json:"bitmap,omitempty"`
+	Mouse    *Mouse    `json:"mouse"`
+	Keyboard *Keyboard `json:"keyboard"`
 }

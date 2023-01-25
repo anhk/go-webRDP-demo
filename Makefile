@@ -7,7 +7,7 @@ OBJ = go-webrdp-demo
 all: $(OBJ)
 
 $(OBJ):
-	go build -ldflags $(GOFLAGS) -o $(OBJ) main.go
+	go build -ldflags $(GOFLAGS) -o $(OBJ) ./
 
 clean:
 	rm -fr $(OBJ)

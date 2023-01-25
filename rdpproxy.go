@@ -43,9 +43,10 @@ func rdpProxy(ctx *gin.Context) {
 				client.DisConnect()
 				break
 			} else {
-				//fmt.Println(msg.Mouse)
 				if msg.Mouse != nil {
 					client.ProcessMouseEvent(msg.Mouse)
+				} else if msg.Keyboard != nil {
+					client.ProcessKeyboardEvent(msg.Keyboard)
 				}
 			}
 		}
