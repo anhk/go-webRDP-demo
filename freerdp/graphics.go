@@ -77,14 +77,16 @@ func webRdpBitmapPaint(context *C.rdpContext, bitmap *C.rdpBitmap) C.BOOL {
 		return C.TRUE
 	}
 
-	client := getClientFromContent(context)
-	client.dataChan <- &Message{Bitmap: &Bitmap{
-		X:    int(bitmap.left),
-		Y:    int(bitmap.top),
-		W:    w,
-		H:    h,
-		Data: buf.Bytes(),
-	}}
+	Try(func() { // Prevent `panic: send on closed channel`
+		client := getClientFromContent(context)
+		client.dataChan <- &Message{Bitmap: &Bitmap{
+			X:    int(bitmap.left),
+			Y:    int(bitmap.top),
+			W:    w,
+			H:    h,
+			Data: buf.Bytes(),
+		}}
+	})
 
 	return C.TRUE
 }

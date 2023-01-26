@@ -1,7 +1,7 @@
 package freerdp
 
 /*
-#cgo darwin CFLAGS: -I /opt/homebrew/Cellar/freerdp/2.9.0/include/freerdp2 -I /opt/homebrew/Cellar/freerdp/2.9.0/include/winpr2/
+#cgo darwin CFLAGS: -g -O0 -I /opt/homebrew/Cellar/freerdp/2.9.0/include/freerdp2 -I /opt/homebrew/Cellar/freerdp/2.9.0/include/winpr2/
 #cgo darwin LDFLAGS: -L /opt/homebrew/Cellar/freerdp/2.9.0/lib -lfreerdp2 -lfreerdp-client2 -lwinpr2
 #cgo linux CFLAGS: -I /usr/include/winpr2/ -I /usr/include/freerdp2/
 #cgo linux LDFLAGS: -lfreerdp2 -lfreerdp-client2 -lwinpr2
@@ -143,6 +143,10 @@ func (c *Client) Start() error {
 			break
 		}
 	}
+	// Prevent `Segment Fault @WaitForMultipleObjects`
+	if C.freerdp_disconnect(context.instance) != C.TRUE {
+		fmt.Println("freerdp_disconnect return FALSE")
+	}
 	return nil
 }
 
@@ -157,7 +161,7 @@ func (c *Client) DisConnect() {
 	close(c.dataChan)
 
 	context := c.context
-	C.freerdp_disconnect(context.instance)
+	C.freerdp_abort_connect(context.instance)
 
 }
 
