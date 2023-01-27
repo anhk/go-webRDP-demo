@@ -151,8 +151,6 @@ func (c *Client) Start() error {
 }
 
 func (c *Client) DisConnect() {
-	fmt.Println("---- ")
-
 	if c.isClosed {
 		return
 	}
@@ -162,7 +160,6 @@ func (c *Client) DisConnect() {
 
 	context := c.context
 	C.freerdp_abort_connect(context.instance)
-
 }
 
 func (c *Client) Data() (*Message, bool) {

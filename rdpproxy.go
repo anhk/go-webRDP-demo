@@ -58,10 +58,10 @@ func rdpProxy(ctx *gin.Context) {
 
 	for {
 		if msg, ok := client.Data(); !ok {
-			fmt.Println(" !ok ")
+			fmt.Println("read from dataChan failed:", ok)
 			break
 		} else if err := ws.WriteJSON(&msg); err != nil {
-			fmt.Println(" err: ", err)
+			fmt.Println("write to websocket failed:", err)
 			break
 		} else {
 			// 打印图片
