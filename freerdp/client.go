@@ -69,11 +69,13 @@ func webRdpClientPostConnect(instance *C.freerdp) C.BOOL {
 	registerGraphics(instance.context.graphics)
 	registerUpdateCallbacks(instance.update)
 
-	C.glyph_cache_register_callbacks(instance.update)
-	C.brush_cache_register_callbacks(instance.update)
-	C.bitmap_cache_register_callbacks(instance.update)
-	C.offscreen_cache_register_callbacks(instance.update)
-	C.palette_cache_register_callbacks(instance.update)
+	// --- Below functions will be called in gdi_init_ex
+	//
+	//C.glyph_cache_register_callbacks(instance.update)
+	//C.brush_cache_register_callbacks(instance.update)
+	//C.bitmap_cache_register_callbacks(instance.update)
+	//C.offscreen_cache_register_callbacks(instance.update)
+	//C.palette_cache_register_callbacks(instance.update)
 	return C.TRUE
 }
 
