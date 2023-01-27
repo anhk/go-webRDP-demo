@@ -9,10 +9,10 @@ type Bitmap struct {
 }
 
 type Mouse struct {
-	Type string `json:"type"`
-	X    int    `json:"x"`
-	Y    int    `json:"y"`
-	Btn  int    `json:"btn"`
+	Type string  `json:"type"`
+	X    float64 `json:"x"`
+	Y    float64 `json:"y"`
+	Btn  int     `json:"btn"`
 }
 
 type Keyboard struct {
