@@ -80,6 +80,6 @@ func webRdpDstBlt(context *C.rdpContext, dstblt *C.cDstbltOrder) C.BOOL {
 
 //export webRdpOpaqueRect
 func webRdpOpaqueRect(context *C.rdpContext, opaque_rect *C.cOpaqueRectOrder) C.BOOL {
-	fmt.Println("webRdpOpaqueRect")
+	//fmt.Println("webRdpOpaqueRect")
 	return C.TRUE
 }

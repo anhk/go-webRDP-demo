@@ -7,10 +7,14 @@ package freerdp
 
 #include "freerdp/freerdp.h"
 
+typedef const BYTE cByte;
 extern BOOL webRdpBitmapNew(rdpContext* context, rdpBitmap* bitmap);
 extern void webRdpBitmapFree(rdpContext* context, rdpBitmap* bitmap);
 extern BOOL webRdpBitmapPaint(rdpContext* context, rdpBitmap* bitmap);
 extern BOOL webRdpBitmapSetSurface(rdpContext* context, rdpBitmap* bitmap, BOOL primary);
+extern BOOL webRdpBitmapDecompress(rdpContext* context, rdpBitmap* bitmap, cByte* data,
+	                                   UINT32 width, UINT32 height, UINT32 bpp, UINT32 length,
+	                                   BOOL compressed, UINT32 codec_id);
 
 static void init_bitmap(rdpGraphics *graphics)
 {
@@ -20,6 +24,7 @@ static void init_bitmap(rdpGraphics *graphics)
     bitmap.Free = webRdpBitmapFree;
     bitmap.Paint = webRdpBitmapPaint;
     bitmap.SetSurface = webRdpBitmapSetSurface;
+	bitmap.Decompress = webRdpBitmapDecompress;
     graphics_register_bitmap(graphics, &bitmap);
 }
 
@@ -72,6 +77,8 @@ import (
 	"image/png"
 	"runtime"
 	"unsafe"
+
+	gobitmap "github.com/GoFeGroup/go-bitmap"
 )
 
 func registerGraphics(graphics *C.rdpGraphics) {
@@ -140,6 +147,50 @@ func webRdpBitmapSetSurface(context *C.rdpContext, bitmap *C.rdpBitmap, primary 
 	return C.TRUE
 }
 
+//export webRdpBitmapDecompress
+func webRdpBitmapDecompress(context *C.rdpContext, bitmap *C.rdpBitmap, data *C.cByte,
+	width, height, bpp, length C.UINT32, compressed C.BOOL, codec_id C.UINT32) C.BOOL {
+	fmt.Printf("%+v\n", bitmap)
+	fmt.Println(width, height, bpp, length)
+
+	ptr := (*C.char)(unsafe.Pointer(data))
+	d := C.GoStringN(ptr, C.int(length))
+
+	fmt.Println("compressed:", compressed, "codecId:", codec_id)
+	var bmp *gobitmap.BitMap
+	if compressed != C.TRUE {
+
+	} else if bpp != 32 {
+		bmp = gobitmap.NewBitmapFromRLE(&gobitmap.Option{
+			Width:       int(width),
+			Height:      int(height),
+			BitPerPixel: int(bpp),
+			Data:        []byte(d),
+		})
+	} else {
+		bmp = gobitmap.NewBitMapFromRDP6(&gobitmap.Option{
+			Width:       int(width),
+			Height:      int(height),
+			BitPerPixel: int(bpp),
+			Data:        []byte(d),
+		})
+	}
+	//fmt.Println(bmp.ToPng())
+
+	Try(func() { // Prevent `panic: send on closed channel`
+		client := getClientFromContent(context)
+		client.dataChan <- &Message{Bitmap: &Bitmap{
+			X:    int(bitmap.left),
+			Y:    int(bitmap.top),
+			W:    int(width),
+			H:    int(height),
+			Data: bmp.ToPng(),
+		}}
+	})
+
+	return C.TRUE
+}
+
 //export webRdpGlyphNew
 func webRdpGlyphNew(context *C.rdpContext, glyph *C.cRdpGlyph) C.BOOL {
 	fmt.Println(runtime.Caller(0))
@@ -174,18 +225,18 @@ func webRdpGlyphEndDraw(context *C.rdpContext, x, y, width, height C.INT32,
 
 //export webRdpPointerNew
 func webRdpPointerNew(context *C.rdpContext, pointer *C.rdpPointer) C.BOOL {
-	fmt.Println(runtime.Caller(0))
+	//fmt.Println(runtime.Caller(0))
 	return C.TRUE
 }
 
 //export webRdpPointerFree
 func webRdpPointerFree(context *C.rdpContext, pointer *C.rdpPointer) {
-	fmt.Println(runtime.Caller(0))
+	//fmt.Println(runtime.Caller(0))
 }
 
 //export webRdpPointerSet
 func webRdpPointerSet(context *C.rdpContext, pointer *C.cRdpPointer) C.BOOL {
-	fmt.Println(runtime.Caller(0))
+	//fmt.Println(runtime.Caller(0))
 	return C.TRUE
 }
 

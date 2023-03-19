@@ -3,6 +3,7 @@ module go-webRDP-demo
 go 1.19
 
 require (
+	github.com/GoFeGroup/go-bitmap v0.0.0-20230319121504-a8531e767ffa
 	github.com/gin-gonic/gin v1.8.2
 	github.com/gorilla/websocket v1.5.0
 )

@@ -10,7 +10,7 @@ func WebServer() {
 	r := gin.Default()
 	r.GET("/api/rdp", rdpProxy)
 	r.Use(feMw("/"))
-	_ = r.Run(":8081")
+	_ = r.Run(":8082")
 }
 
 func main() {
