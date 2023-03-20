@@ -78,6 +78,8 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/GoFeGroup/go-bitmap/glog"
+
 	gobitmap "github.com/GoFeGroup/go-bitmap"
 )
 
@@ -150,30 +152,28 @@ func webRdpBitmapSetSurface(context *C.rdpContext, bitmap *C.rdpBitmap, primary 
 //export webRdpBitmapDecompress
 func webRdpBitmapDecompress(context *C.rdpContext, bitmap *C.rdpBitmap, data *C.cByte,
 	width, height, bpp, length C.UINT32, compressed C.BOOL, codec_id C.UINT32) C.BOOL {
-	fmt.Printf("%+v\n", bitmap)
-	fmt.Println(width, height, bpp, length)
+	//fmt.Printf("%+v\n", bitmap)
+	//fmt.Println("w,h,bpp,length:", width, height, bpp, length)
 
-	ptr := (*C.char)(unsafe.Pointer(data))
-	d := C.GoStringN(ptr, C.int(length))
+	d := C.GoBytes(unsafe.Pointer(data), C.int(length))
 
-	fmt.Println("compressed:", compressed, "codecId:", codec_id)
+	//fmt.Println("compressed:", compressed, "codecId:", codec_id)
+
 	var bmp *gobitmap.BitMap
-	if compressed != C.TRUE {
+	option := &gobitmap.Option{
+		Width:       int(width),
+		Height:      int(height),
+		BitPerPixel: int(bpp),
+		Data:        d,
+	}
 
+	glog.SetLevel(glog.NONE)
+	if compressed != C.TRUE {
+		bmp = gobitmap.NewBitmapFromPlain(option)
 	} else if bpp != 32 {
-		bmp = gobitmap.NewBitmapFromRLE(&gobitmap.Option{
-			Width:       int(width),
-			Height:      int(height),
-			BitPerPixel: int(bpp),
-			Data:        []byte(d),
-		})
+		bmp = gobitmap.NewBitmapFromRLE(option)
 	} else {
-		bmp = gobitmap.NewBitMapFromRDP6(&gobitmap.Option{
-			Width:       int(width),
-			Height:      int(height),
-			BitPerPixel: int(bpp),
-			Data:        []byte(d),
-		})
+		bmp = gobitmap.NewBitMapFromRDP6(option)
 	}
 	//fmt.Println(bmp.ToPng())
 
